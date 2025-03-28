@@ -129,6 +129,7 @@
 </div>
 
 
+
         <div class="editor-grid">
             <div class="editor-box">
                 <h3>Input Script</h3>
@@ -190,35 +191,30 @@
     });
 
 
-        function encode() {
-            const input = document.getElementById('input').value;
-            const addLoadstring = document.getElementById('addLoadstring').checked;
-            const addDecoder = document.getElementById('addDecoder').checked;
-            const minify = document.getElementById('minify').checked;
-            
-            let result = '';
-            
-            for (let i = 0; i < input.length; i++) {
-                const charCode = input.charCodeAt(i);
-                result += `X${charCode.toString(36)}Y`;
-            }
-
-            if (minify) {
-                result = result.replace(/\s+/g, '');
-            }
-
-            let finalOutput = result;
-            
-            if (addDecoder) {
-                finalOutput = `loadstring(game:HttpGet("https://raw.githubusercontent.com/SYFER-eng/Roblox-Decoder/refs/heads/main/Decode/Decoder.lua",true))()\n\n` + finalOutput;
-            }
-            
-            if (addLoadstring) {
-                finalOutput = `local encoded = "${finalOutput}"\nloadstring(encoded)()`;
-            }
-            
-            document.getElementById('output').value = finalOutput;
-        }
+function encode() {
+    const input = document.getElementById('input').value;
+    const addDecoder = document.getElementById('addDecoder').checked;
+    const minify = document.getElementById('minify').checked;
+    
+    let result = '';
+    
+    for (let i = 0; i < input.length; i++) {
+        const charCode = input.charCodeAt(i);
+        result += `X${charCode.toString(36)}Y`;
+    }
+    
+    if (minify) {
+        result = result.replace(/\s+/g, '');
+    }
+    
+    let finalOutput = result;
+    
+    if (addDecoder) {
+        finalOutput = `loadstring(game:HttpGet("https://raw.githubusercontent.com/SYFER-eng/Roblox-Decoder/refs/heads/main/Decode/Decoder.lua",true))()\n\n` + finalOutput;
+    }
+    
+    document.getElementById('output').value = finalOutput;
+}
 
         function copyOutput() {
             const output = document.getElementById('output');
