@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Roblox Lua Encoder Pro</title>
+    <title>Lua Script Encoder</title>
     <style>
         body {
             background: #1a1a1a;
@@ -43,37 +43,29 @@
         button:hover {
             background: #00cc00;
         }
-        .title {
-            color: #00ff00;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="title">Roblox Lua Encoder Pro</h1>
+        <h2>Lua Script Encoder</h2>
         <textarea id="input" placeholder="Enter your Lua code here..."></textarea>
         <button onclick="encode()">Encode</button>
         <textarea id="output" readonly></textarea>
     </div>
 
     <script>
-        const symbols = "!@#$%^&*()_+-=[]{}|;:,.<>?`~";
-        const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        
         function encode() {
             const input = document.getElementById('input').value;
-            let encoded = '';
+            let result = '';
             
+            // Convert each character to base36 and add markers
             for (let i = 0; i < input.length; i++) {
-                const char = input.charCodeAt(i);
-                const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-                const randomLetter = letters[Math.floor(Math.random() * letters.length)];
-                encoded += `${randomLetter}${char.toString(36)}${randomSymbol}`;
+                const charCode = input.charCodeAt(i);
+                result += `X${charCode.toString(36)}Y`;
             }
             
-            const decoderUrl = "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/SYFER-eng/Roblox-Decoder/refs/heads/main/Decode/Decoder.lua\",true))()\n\n";
-            const finalOutput = decoderUrl + `local encoded = "${encoded}"`;
+            // Create the final output with decoder loader
+            const finalOutput = `loadstring(game:HttpGet("https://raw.githubusercontent.com/SYFER-eng/Roblox-Decoder/refs/heads/main/Decode/Decoder.lua",true))()\n\nlocal encoded = "${result}"`;
             
             document.getElementById('output').value = finalOutput;
         }
