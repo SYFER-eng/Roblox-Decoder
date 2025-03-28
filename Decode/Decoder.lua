@@ -1,55 +1,44 @@
--- Advanced Lua Decoder v2.1
--- Created by SYFER
-
-local function createSecureEnvironment()
-    return setmetatable({}, {__index = getfenv()})
-end
-
-local function decodeString(str)
+local function decode(str)
     local decoded = ""
-    local index = 1
+    local i = 1
     
-    while index <= #str do
-        -- Find next valid pattern
-        local letterStart, letterEnd = str:find("[a-zA-Z]", index)
-        if not letterStart then break end
-        
-        local numStart = letterEnd + 1
-        local numEnd = str:find("[^a-zA-Z0-9]", numStart)
-        if not numEnd then break end
-        
-        -- Extract and convert
-        local num = str:sub(numStart, numEnd - 1)
-        local charCode = tonumber(num, 36)
-        
-        if charCode then
-            decoded = decoded .. string.char(charCode)
+    while i <= #str do
+        if str:sub(i,i) == "X" then
+            local numEnd = str:find("Y", i)
+            if numEnd then
+                local num = tonumber(str:sub(i+1, numEnd-1), 36)
+                decoded = decoded .. string.char(num)
+                i = numEnd + 1
+            else
+                i = i + 1
+            end
+        else
+            i = i + 1
         end
-        
-        index = numEnd + 1
     end
     
     return decoded
 end
 
-local function executeScript(decodedScript)
-    local env = createSecureEnvironment()
-    local fn, err = loadstring(decodedScript)
+-- Automatically detect and decode the input
+local function autoDecodeAndExecute()
+    local env = getfenv()
+    local oldPrint = env.print
     
-    if fn then
-        setfenv(fn, env)
-        return pcall(fn)
+    env.print = function(...)
+        local args = {...}
+        for i, v in ipairs(args) do
+            if type(v) == "string" then
+                args[i] = decode(v)
+            end
+        end
+        return oldPrint(unpack(args))
     end
-    return false, err
+    
+    return function(encoded)
+        local decoded = decode(encoded)
+        return loadstring(decoded)()
+    end
 end
 
--- Main execution
-local encoded = getfenv(1).encoded
-if encoded then
-    local decodedScript = decodeString(encoded)
-    local success, result = executeScript(decodedScript)
-    
-    if not success then
-        warn("Execution failed:", result)
-    end
-end
+return autoDecodeAndExecute()
